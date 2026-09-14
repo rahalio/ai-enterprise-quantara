@@ -1,0 +1,983 @@
+openapi: 3.0.3
+info:
+  title: Quantara
+  version: 0.1.0
+  description: ML business-case ledger for first-year ROI across revenue, efficiency, and capital benefits
+    versus data, people, and vendor costs.
+  x-product-slug: ai-enterprise-quantara
+  x-source: ai-in-enterprise/deloitte-TG_Google Machine Learning report_Digital Final/
+servers:
+- url: https://api.example.com
+tags:
+- name: Cases
+  description: ML cases
+- name: Benefits
+  description: Benefit lines
+- name: Costs
+  description: Cost lines
+- name: ROI
+  description: ROI snapshots
+- name: Readiness
+  description: Stage gates
+- name: Vendors
+  description: Vendor engagements
+- name: Portfolio
+  description: Prioritisation
+- name: Governance
+  description: Failures and audit
+paths:
+  /v1/cases:
+    get:
+      operationId: listMlCases
+      tags:
+      - Cases
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Cases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeMlCase'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: createMlCase
+      tags:
+      - Cases
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeMlCase'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MlCaseCreate'
+  /v1/cases/{caseId}:
+    parameters:
+    - name: caseId
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: getMlCase
+      tags:
+      - Cases
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Case
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeMlCase'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/cases/{caseId}/continue-invest:
+    parameters:
+    - name: caseId
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      operationId: decideContinueInvest
+      tags:
+      - Cases
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Decision recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeMlCase'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContinueInvestRequest'
+  /v1/benefits:
+    post:
+      operationId: addBenefitLine
+      tags:
+      - Benefits
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: Benefit added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeBenefitLine'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BenefitLineCreate'
+  /v1/costs:
+    post:
+      operationId: addCostLine
+      tags:
+      - Costs
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: Cost added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeCostLine'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CostLineCreate'
+  /v1/roi-snapshots:
+    get:
+      operationId: listRoiSnapshots
+      tags:
+      - ROI
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: ROI snapshots
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeRoiSnapshot'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: createRoiSnapshot
+      tags:
+      - ROI
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: Snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeRoiSnapshot'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoiSnapshotCreate'
+  /v1/readiness-checks:
+    post:
+      operationId: submitReadinessCheck
+      tags:
+      - Readiness
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: Readiness checked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeReadinessCheck'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReadinessCheckCreate'
+  /v1/vendors:
+    post:
+      operationId: registerVendorEngagement
+      tags:
+      - Vendors
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: Vendor registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeVendorEngagement'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorEngagementCreate'
+  /v1/portfolio/scores:
+    get:
+      operationId: listPrioritisationScores
+      tags:
+      - Portfolio
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Scores
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopePrioritisationScore'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+  /v1/failures:
+    post:
+      operationId: recordFailure
+      tags:
+      - Governance
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: Failure recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeFailureRecord'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FailureRecordCreate'
+  /v1/governance/audit-entries:
+    get:
+      operationId: listAuditEntries
+      tags:
+      - Governance
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Audit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeAuditEntry'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+  /v1/cases/{caseId}/benefits:
+    parameters:
+    - name: caseId
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: listCaseBenefits
+      tags:
+      - Benefits
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Benefits for case
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeBenefitLine'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/cases/{caseId}/costs:
+    parameters:
+    - name: caseId
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: listCaseCosts
+      tags:
+      - Costs
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Costs for case
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeCostLine'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      schema:
+        type: string
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    UnprocessableEntity:
+      description: Unprocessable entity
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    ResponseMeta:
+      type: object
+      required:
+      - requestId
+      - timestamp
+      properties:
+        requestId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    Problem:
+      type: object
+      required:
+      - type
+      - title
+      - status
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+    MlCase:
+      type: object
+      required:
+      - id
+      - name
+      - stage
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        stage:
+          type: string
+          enum:
+          - capability
+          - define
+          - execute
+          - assess
+          - transform
+        status:
+          type: string
+          enum:
+          - active
+          - funded
+          - stopped
+          - failed
+          - scaled
+    DataEnvelopeMlCase:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/MlCase'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeMlCase:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/MlCase'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    BenefitLine:
+      type: object
+      required:
+      - id
+      - caseId
+      - family
+      - amount
+      properties:
+        id:
+          type: string
+        caseId:
+          type: string
+        family:
+          type: string
+          enum:
+          - revenue
+          - efficiency
+          - capital
+        amount:
+          type: number
+        currency:
+          type: string
+    DataEnvelopeBenefitLine:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/BenefitLine'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeBenefitLine:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/BenefitLine'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    CostLine:
+      type: object
+      required:
+      - id
+      - caseId
+      - category
+      - amount
+      properties:
+        id:
+          type: string
+        caseId:
+          type: string
+        category:
+          type: string
+          enum:
+          - data
+          - human_resources
+          - vendor
+        amount:
+          type: number
+        isImplementation:
+          type: boolean
+    DataEnvelopeCostLine:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/CostLine'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeCostLine:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/CostLine'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    RoiSnapshot:
+      type: object
+      required:
+      - id
+      - caseId
+      - kind
+      - roiMultiple
+      properties:
+        id:
+          type: string
+        caseId:
+          type: string
+        kind:
+          type: string
+          enum:
+          - estimate
+          - realized
+        roiMultiple:
+          type: number
+        asOf:
+          type: string
+          format: date
+    DataEnvelopeRoiSnapshot:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/RoiSnapshot'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeRoiSnapshot:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/RoiSnapshot'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ReadinessCheck:
+      type: object
+      required:
+      - id
+      - caseId
+      - passed
+      properties:
+        id:
+          type: string
+        caseId:
+          type: string
+        hasHypothesis:
+          type: boolean
+        hasBenchmark:
+          type: boolean
+        hasData:
+          type: boolean
+        passed:
+          type: boolean
+    DataEnvelopeReadinessCheck:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/ReadinessCheck'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeReadinessCheck:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReadinessCheck'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    VendorEngagement:
+      type: object
+      required:
+      - id
+      - caseId
+      - vendorName
+      properties:
+        id:
+          type: string
+        caseId:
+          type: string
+        vendorName:
+          type: string
+        customisation:
+          type: string
+        plannedMonths:
+          type: integer
+    DataEnvelopeVendorEngagement:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/VendorEngagement'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeVendorEngagement:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/VendorEngagement'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    PrioritisationScore:
+      type: object
+      required:
+      - id
+      - caseId
+      - score
+      properties:
+        id:
+          type: string
+        caseId:
+          type: string
+        score:
+          type: number
+        ready:
+          type: boolean
+    DataEnvelopePrioritisationScore:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/PrioritisationScore'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopePrioritisationScore:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/PrioritisationScore'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    FailureRecord:
+      type: object
+      required:
+      - id
+      - caseId
+      - reason
+      properties:
+        id:
+          type: string
+        caseId:
+          type: string
+        reason:
+          type: string
+    DataEnvelopeFailureRecord:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/FailureRecord'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeFailureRecord:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/FailureRecord'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    AuditEntry:
+      type: object
+      required:
+      - id
+      - eventType
+      - occurredAt
+      properties:
+        id:
+          type: string
+        eventType:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time
+    DataEnvelopeAuditEntry:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/AuditEntry'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeAuditEntry:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/AuditEntry'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    MlCaseCreate:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+        hypothesis:
+          type: string
+    BenefitLineCreate:
+      type: object
+      required:
+      - caseId
+      - family
+      - amount
+      properties:
+        caseId:
+          type: string
+        family:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+    CostLineCreate:
+      type: object
+      required:
+      - caseId
+      - category
+      - amount
+      properties:
+        caseId:
+          type: string
+        category:
+          type: string
+        amount:
+          type: number
+        isImplementation:
+          type: boolean
+    RoiSnapshotCreate:
+      type: object
+      required:
+      - caseId
+      - kind
+      - roiMultiple
+      properties:
+        caseId:
+          type: string
+        kind:
+          type: string
+        roiMultiple:
+          type: number
+    ReadinessCheckCreate:
+      type: object
+      required:
+      - caseId
+      properties:
+        caseId:
+          type: string
+        hasHypothesis:
+          type: boolean
+        hasBenchmark:
+          type: boolean
+        hasData:
+          type: boolean
+    VendorEngagementCreate:
+      type: object
+      required:
+      - caseId
+      - vendorName
+      properties:
+        caseId:
+          type: string
+        vendorName:
+          type: string
+        customisation:
+          type: string
+        plannedMonths:
+          type: integer
+    FailureRecordCreate:
+      type: object
+      required:
+      - caseId
+      - reason
+      properties:
+        caseId:
+          type: string
+        reason:
+          type: string
+    ContinueInvestRequest:
+      type: object
+      required:
+      - decision
+      properties:
+        decision:
+          type: string
+          enum:
+          - continue
+          - stop
+        notes:
+          type: string
